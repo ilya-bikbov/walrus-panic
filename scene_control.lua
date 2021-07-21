@@ -49,6 +49,7 @@ local wall_frames = {
 
 local ground_frames = {
 	frame1 = {type = "image", filename = "Sprites/ground.png"},
+	frame2 = {type = "image", filename = "Sprites/ground2.png"},
 }
 
 local target_frames = {
@@ -88,12 +89,21 @@ end
 function draw_graphics(boxes_coords, targets_coords, matrix)
 	local x = 0
 	local y = 0
+	local x_num = 0
+	local y_num = 0
 	for m, name in ipairs(level_matrix) do
  		for n, name2 in ipairs(name) do
  			local block_type = name2
  			if block_type == "0" then
  				vasya.rect = display.newRect( vasya_group, x, y, vasya.width, vasya.height )
 				vasya.rect.fill = vasya_frames.frame3
+
+				camera:add(vasya.rect, 1) -- Add player to layer 1 of the camera
+				camera.damping = 1 -- A bit more fluid tracking
+				camera:setFocus(vasya.rect) -- Set the focus to the player
+				--camera:track() -- Begin auto-tracking
+				camera:trackFocus()
+				--camera:add(myImage, 2)
  			end
  			if block_type == "1" then
  			end
@@ -120,6 +130,8 @@ function draw_graphics(boxes_coords, targets_coords, matrix)
  			end
 
  			local ground1 = display.newRect( ground_group, x, y, vasya.width, vasya.height )
+ 			ground1:setStrokeColor( 0, 0, 0, 0.1 )
+ 			ground1.strokeWidth = 1
  			ground1.fill = ground_frames.frame1
  			table.insert(grounds, ground1)
  			camera:add(ground1, 4)
@@ -132,20 +144,35 @@ function draw_graphics(boxes_coords, targets_coords, matrix)
  					camera:add(target1, 2)
 				end
 			end
- 			x = x + vasya.width --vasya? 
+ 			x = x + vasya.width --vasya?
+ 			x_num = #name 
  		end
+ 		y_num = #level_matrix
  		x = 0
  		y = y + vasya.width --vasya?
  	end
-
- 	camera:add(vasya.rect, 1) -- Add player to layer 1 of the camera
-	--camera:prependLayer() --???
-	camera.damping = 1 -- A bit more fluid tracking
-	camera:setFocus(vasya.rect) -- Set the focus to the player
-	--camera:setBounds(0, 64 , 0, 64)
-	--camera:track() -- Begin auto-tracking
-	camera:trackFocus()
-	--camera:add(myImage, 2)
+--[[
+	Background floor generating
+--]]
+ 	x = 0
+ 	y = 0
+ 	local background_slide_count = 5
+ 	x = x - (vasya.width * background_slide_count)
+ 	y = y - (vasya.width * background_slide_count)
+ 	for i = 1, background_slide_count*2+y_num do
+ 		for j = 1, background_slide_count*2+x_num do
+ 			local background1 = display.newRect( ground_group, x, y, vasya.width, vasya.height)
+ 			background1:setStrokeColor( 0, 0, 0, 0.1 )
+ 			background1.strokeWidth = 2
+ 			background1.fill = ground_frames.frame2
+ 			table.insert(grounds, background1)
+ 			camera:add(background1, 5)
+ 			x = x + vasya.width --vasya?
+ 		end
+ 		x = 0
+ 		x = x - (vasya.width * background_slide_count)
+ 		y = y + vasya.width --vasya?
+ 	end
 end
 
 --[[
