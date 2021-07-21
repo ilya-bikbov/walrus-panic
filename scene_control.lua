@@ -152,14 +152,15 @@ function draw_graphics(boxes_coords, targets_coords, matrix)
  		y = y + vasya.width --vasya?
  	end
 --[[
-	Background floor generating
+	Background floor generating 
 --]]
+--  Top
  	x = 0
  	y = 0
  	local background_slide_count = 5
  	x = x - (vasya.width * background_slide_count)
  	y = y - (vasya.width * background_slide_count)
- 	for i = 1, background_slide_count*2+y_num do
+ 	for i = 1, background_slide_count do
  		for j = 1, background_slide_count*2+x_num do
  			local background1 = display.newRect( ground_group, x, y, vasya.width, vasya.height)
  			background1:setStrokeColor( 0, 0, 0, 0.1 )
@@ -168,6 +169,50 @@ function draw_graphics(boxes_coords, targets_coords, matrix)
  			table.insert(grounds, background1)
  			camera:add(background1, 5)
  			x = x + vasya.width --vasya?
+ 		end
+ 		x = 0
+ 		x = x - (vasya.width * background_slide_count)
+ 		y = y + vasya.width --vasya?
+ 	end
+--  Bottom
+	x = 0
+ 	--y = 0
+ 	background_slide_count = 5
+ 	x = x - (vasya.width * background_slide_count)
+ 	y = y + (vasya.width * y_num)
+ 	for i = 1, background_slide_count do
+ 		for j = 1, background_slide_count*2+x_num do
+ 			local background1 = display.newRect( ground_group, x, y, vasya.width, vasya.height)
+ 			background1:setStrokeColor( 0, 0, 0, 0.1 )
+ 			background1.strokeWidth = 2
+ 			background1.fill = ground_frames.frame2
+ 			table.insert(grounds, background1)
+ 			camera:add(background1, 5)
+ 			x = x + vasya.width --vasya?
+ 		end
+ 		x = 0
+ 		x = x - (vasya.width * background_slide_count)
+ 		y = y + vasya.width --vasya?
+ 	end
+--  Sides
+	x = 0
+ 	y = 0
+ 	background_slide_count = 5
+ 	x = x - (vasya.width * background_slide_count)
+ 	--y = y - (vasya.width * background_slide_count)
+ 	for i = 1, y_num do
+ 		for j = 1, background_slide_count*2+1 do
+ 			local background1 = display.newRect( ground_group, x, y, vasya.width, vasya.height)
+ 			background1:setStrokeColor( 0, 0, 0, 0.1 )
+ 			background1.strokeWidth = 2
+ 			background1.fill = ground_frames.frame2
+ 			table.insert(grounds, background1)
+ 			camera:add(background1, 5)
+ 			if j == background_slide_count then
+ 				x = x + (vasya.width*x_num) 
+ 			else
+ 				x = x + vasya.width --vasya?
+ 			end
  		end
  		x = 0
  		x = x - (vasya.width * background_slide_count)
