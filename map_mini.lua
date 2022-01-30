@@ -19,7 +19,7 @@ local set_block_color = {
   							["3"] = function (x) _block_color.r=223 _block_color.g=134 	_block_color.b=0 end,
   							["4"] = function (x) _block_color.r=0 	_block_color.g=0 	_block_color.b=255 end,
   							["5"] = function (x) _block_color.r=180 _block_color.g=0 	_block_color.b=0 end,
-  							["6"] = function (x) _block_color.r=0 _block_color.g=255 	_block_color.b=0 _block_color.a=0.5 end,
+  							["6"] = function (x) _block_color.r=0 _block_color.g=255 	_block_color.b=0 _block_color.a=1 end,
 						}
 local block_rect_group
 local _map_rect
@@ -114,12 +114,6 @@ function draw_mini_map(_screen, _map_window)
 	block_rect_group.x = block_rect_group.x - (block_rect_group.contentWidth/2)
 
 	block_rect_group.y = block_rect_group.y + ((_map_rect.contentHeight - block_rect_group.contentHeight) / 2)
-
-	--block_rect_group.y = _map_rect.y --+ ((_map_rect.contentHeight - block_rect_group.contentHeight) / 2)
-	--print(_map_rect.y  )
-	--block_rect_group.y = _map_rect.contentHeight/2
-
-	--block_rect_group.y = block_rect_group.y + (block_rect_group.contentHeight)
 end
 
 

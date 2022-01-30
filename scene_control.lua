@@ -3,7 +3,14 @@
 -- scene_control.lua
 --
 -----------------------------------------------------------------------------------------
+require "map_control"
 require "tools"
+
+local _screen = nil
+local _map_window = nil
+
+local function update()
+end
 
 --------------------------------------------------------------------------------
 -- Build Camera
@@ -12,7 +19,40 @@ local require = require
 local perspective = require("perspective")
 local function forcesByAngle(totalForce, angle) local forces = {} local radians = -math.rad(angle) forces.x = math.cos(radians) * totalForce forces.y = math.sin(radians) * totalForce return forces end
 local camera = perspective.createView()
-
+local function move_camera(vasya, move_direction)
+	local koef = 5
+	print(">>>>>>>>")
+	local a, b = vasya.rect:localToContent(0, 0)
+	print(a.." "..b)
+	if move_direction == "left" then
+		if a < (_screen.x + ((_screen.w/4)))then
+			camera:setBounds(vasya.rect.x+20, vasya.rect.x+20, vasya.rect.y, vasya.rect.y)
+		end
+		return
+	end
+	if move_direction == "right" then
+		if a > (_screen.w - ((_screen.w/4)))then
+			camera:setBounds(vasya.rect.x-20, vasya.rect.x-20, vasya.rect.y, vasya.rect.y)
+		end
+		return
+	end
+	if move_direction == "up" then
+		print("vvv")
+		print((_screen.y + (_screen.h/2.5)))
+		if (b < (_screen.y + (_screen.h/2.5))) then
+			print("UP")
+			camera:setBounds(vasya.rect.x, vasya.rect.x, vasya.rect.y+150, vasya.rect.y+150)
+		end
+		return
+	end
+	if move_direction == "down" then
+		if (b > ((_screen.y + _screen.h - ( _screen.h / 3.5)))) then
+			print("DOWN")
+			camera:setBounds(vasya.rect.x, vasya.rect.x, vasya.rect.y, vasya.rect.y)
+		end
+		return
+	end
+end
 local move_direction = ""
 local players_neighbor_type = 1 --?
 local box_to_move_coords = {	x, 
@@ -48,8 +88,8 @@ local wall_frames = {
 }
 
 local ground_frames = {
-	frame1 = {type = "image", filename = "Sprites/ground.png"},
-	frame2 = {type = "image", filename = "Sprites/ground2.png"},
+	frame1 = {type = "image", filename = "Sprites/ground.jpg"},
+	frame2 = {type = "image", filename = "Sprites/ground2.jpg"},
 }
 
 local target_frames = {
@@ -61,9 +101,8 @@ local vasya_group = display.newGroup()
 local vasya = 	{
 					x = 0,
 					y = 0,
-					width = 50,
-					height = 50,
-					move_speed = 10,
+					width = 30,
+					height = 30,
 					rect = display.newRect( 0, 0, 0, 0),
 				}
 
@@ -86,7 +125,10 @@ function Box:new (o)
   return o
 end
 
-function draw_graphics(boxes_coords, targets_coords, matrix)
+function draw_graphics(boxes_coords, targets_coords, matrix, upd, scr, map_scr)
+	update = upd
+	_screen = scr
+	_map_window = map_scr
 	local x = 0
 	local y = 0
 	local x_num = 0
@@ -99,10 +141,12 @@ function draw_graphics(boxes_coords, targets_coords, matrix)
 				vasya.rect.fill = vasya_frames.frame3
 
 				camera:add(vasya.rect, 1) -- Add player to layer 1 of the camera
-				camera.damping = 1 -- A bit more fluid tracking
-				camera:setFocus(vasya.rect) -- Set the focus to the player
+				camera.damping = 10 -- A bit more fluid tracking
+				--camera:setFocus(vasya.rect) -- Set the focus to the player
+				camera:toPoint(500, 500)
+				camera:setBounds(vasya.rect.x, vasya.rect.x, vasya.rect.y, vasya.rect.y)
 				--camera:track() -- Begin auto-tracking
-				camera:trackFocus()
+				--camera:trackFocus()
 				--camera:add(myImage, 2)
  			end
  			if block_type == "1" then
@@ -154,10 +198,13 @@ function draw_graphics(boxes_coords, targets_coords, matrix)
 --[[
 	Background floor generating 
 --]]
+--[[
+
+--]]
 --  Top
  	x = 0
  	y = 0
- 	local background_slide_count = 5
+ 	local background_slide_count = 10
  	x = x - (vasya.width * background_slide_count)
  	y = y - (vasya.width * background_slide_count)
  	for i = 1, background_slide_count do
@@ -177,7 +224,7 @@ function draw_graphics(boxes_coords, targets_coords, matrix)
 --  Bottom
 	x = 0
  	--y = 0
- 	background_slide_count = 5
+ 	background_slide_count = 10
  	x = x - (vasya.width * background_slide_count)
  	y = y + (vasya.width * y_num)
  	for i = 1, background_slide_count do
@@ -197,7 +244,7 @@ function draw_graphics(boxes_coords, targets_coords, matrix)
 --  Sides
 	x = 0
  	y = 0
- 	background_slide_count = 5
+ 	background_slide_count = 10
  	x = x - (vasya.width * background_slide_count)
  	--y = y - (vasya.width * background_slide_count)
  	for i = 1, y_num do
@@ -225,21 +272,21 @@ end
 --]]
 local function box_move1()
 	if move_direction == "up" then 
-		box_to_animate.rect:translate( 0, -vasya.move_speed )
+		box_to_animate.rect:translate( 0, -((vasya.width/5)) )
 	end
 	if move_direction == "down" then 
-		box_to_animate.rect:translate( 0, vasya.move_speed )
+		box_to_animate.rect:translate( 0, (vasya.width/5) )
 	end
 	if move_direction == "left" then
-		box_to_animate.rect:translate( -vasya.move_speed, 0 )
+		box_to_animate.rect:translate( -((vasya.width/5)), 0 )
 	end
 	if move_direction == "right" then
-		box_to_animate.rect:translate( vasya.move_speed, 0 )
+		box_to_animate.rect:translate( (vasya.width/5), 0 )
 	end
 end 
 local function box_move()
 	box_move1()
-	timer.performWithDelay( 50, box_move1, 4)
+	timer.performWithDelay( 1, box_move1, 4)
 end
 --[[--]]
 --[[
@@ -263,37 +310,38 @@ local function move_animation1()
 end
 local function move_animation()
 	move_animation1()
-	timer.performWithDelay( 100, move_animation1, 2)
+	timer.performWithDelay( 1, move_animation1, 2)
 end 
 --[[--]]
 --[[
 	Vasya moving
 --]]
 local function move1()
-	print(move_direction)
+	--print(move_direction)
 	if move_direction == "up" then 
 		--vasya_group:translate( 0, -vasya.move_speed )
-		vasya.rect:translate( 0, -vasya.move_speed )
+		vasya.rect:translate( 0, -((vasya.width/5)) )
 	end
 	if move_direction == "down" then 
 		--vasya_group:translate( 0, vasya.move_speed )
-		vasya.rect:translate( 0, vasya.move_speed )
+		vasya.rect:translate( 0, (vasya.width/5) )
 	end
 	if move_direction == "left" then
 		--vasya_group:translate( -vasya.move_speed, 0 )
-		vasya.rect:translate( -vasya.move_speed, 0 )
+		vasya.rect:translate( -((vasya.width/5)), 0 )
 	end
 	if move_direction == "right" then 
 		--vasya_group:translate( vasya.move_speed, 0 )
-		vasya.rect:translate( vasya.move_speed, 0 )
+		vasya.rect:translate( (vasya.width/5), 0 )
 	end
 	camera:trackFocus()
 end 
 local function move()
 	move1()
-	timer.performWithDelay( 50, move1, 4)
+	timer.performWithDelay( 1, move1, 4)
 end 
-function vasya_move(direction, next_item_type, box_coords_x, box_coords_y)
+local function vasya_move(direction, next_item_type, box_coords_x, box_coords_y)
+	touchOff()
 	move_direction = direction
 	players_neighbor_type = next_item_type
 
@@ -302,6 +350,7 @@ function vasya_move(direction, next_item_type, box_coords_x, box_coords_y)
 			coroutine.resume( co )
 			local co1 = coroutine.create( move_animation )
 			coroutine.resume( co1 )
+			move_camera(vasya, move_direction)
 	end
 
 	if (players_neighbor_type == "3") then
@@ -334,8 +383,37 @@ function vasya_move(direction, next_item_type, box_coords_x, box_coords_y)
 			end
 		end
 	end
+	--camera:toPoint(vasya.rect.x, vasya.rect.y)
+	update()
 end
 --[[--]]
+
+local function globalTouchHandler(event)
+    local swipeLengthX = math.abs(event.x - event.xStart) 
+    local swipeLengthY = math.abs(event.y - event.yStart) 
+    --print(event.phase, swipeLength)
+
+    local t = event.target
+    local phase = event.phase
+
+    if (phase == "began") then
+
+    elseif (phase == "moved") then
+
+    elseif (phase == "ended"--[[or phase == "cancelled"]]) then
+        --vasya_move -> start_animation_actions
+        if (event.xStart > event.x and swipeLengthX > 70) then 
+            vasya_move(player_move("left"))
+        elseif (event.xStart < event.x and swipeLengthX > 70) then 
+            vasya_move(player_move("right"))
+        elseif (event.yStart > event.y  and swipeLengthY > 70) then
+            vasya_move(player_move("up"))
+    	elseif (event.yStart < event.y and swipeLengthY > 70) then
+            vasya_move(player_move("down"))
+        end
+    end
+end
+
 
 function instantiate_scene()
 		move_direction = ""
@@ -368,4 +446,10 @@ function instantiate_scene()
 		boxes = {}
 end
 
+function touchOn()
+	Runtime:addEventListener("touch", globalTouchHandler)
+end
 
+function touchOff()
+	Runtime:removeEventListener( "touch", globalTouchHandler )
+end

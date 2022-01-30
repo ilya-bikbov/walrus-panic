@@ -61,53 +61,35 @@ end
 --[[--]]
 
 local current_level = 0
+local update = nil
 local function start_level()
 	current_level = current_level + 1
     instantiate_matrix()
     load_level(current_level)
     read_matrix()
-	print_matrix(level_matrix)
+	--print_matrix(level_matrix)
 	draw_mini_map(_screen,_map_window)
 	instantiate_scene()
-	draw_graphics(boxes, targets, level_matrix)
+	--local cr = coroutine.create(draw_graphics)
+	--coroutine.resume(cr, boxes, targets, level_matrix)
+	--update()
+	draw_graphics(boxes, targets, level_matrix, update, _screen, _map_window)
+	touchOn()
 end
 
-
-local function globalTouchHandler(event)
-    local swipeLengthX = math.abs(event.x - event.xStart) 
-    local swipeLengthY = math.abs(event.y - event.yStart) 
-    --print(event.phase, swipeLength)
-
-    local t = event.target
-    local phase = event.phase
-
-    if (phase == "began") then
-
-    elseif (phase == "moved") then
-
-    elseif (phase == "ended" or phase == "cancelled") then
-        --vasya_move -> start_animation_actions
-        if (event.xStart > event.x and swipeLengthX > 50) then 
-            vasya_move(player_move("left"))
-        elseif (event.xStart < event.x and swipeLengthX > 50) then 
-            vasya_move(player_move("right"))
-        elseif (event.yStart > event.y  and swipeLengthY > 50) then
-            vasya_move(player_move("up"))
-    	elseif (event.yStart < event.y and swipeLengthY > 50) then
-            vasya_move(player_move("down"))
-        end
-        print("--- redraw ---")
-        read_matrix()
-        draw_mini_map(_screen,_map_window)
-        print_matrix(level_matrix)
-        print(check_victory())
-        if (check_victory() == true) then
-        	start_level()
-        end
-        print("--- / ---")
-    end
+update = function ()
+	--print("--- redraw ---")
+	read_matrix()
+	draw_mini_map(_screen,_map_window)
+	--print_matrix(level_matrix)
+	--print(check_victory())
+	if (check_victory() == true) then
+		touchOff()
+		start_level()
+		return
+	end
+	--print("--- / ---")
+	touchOn()
 end
-
 
 start_level()
-Runtime:addEventListener("touch", globalTouchHandler)
