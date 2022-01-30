@@ -20,12 +20,12 @@ local _screen = {
 			 	}
 
 local _map_window = {
-						x = _screen.x,
-						y = (_screen.y + _screen.h - ( _screen.h / 4)),
-						w = _screen.w,
-						h = _screen.h / 4,
-						color_border = { 0, 0, 0, 0.8 },
-						color_background = {0, 0, 0, 0.3},
+						x = (_screen.x),
+						y = (_screen.y + _screen.h - ( _screen.h / 4)) - 3,
+						w = (_screen.w),
+						h = (_screen.h / 4),
+						--color_border = { 0, 0, 0, 0 },
+						color_background = {0, 0, 0, 0.2},
 					}
 
 
@@ -67,7 +67,7 @@ local function start_level()
     load_level(current_level)
     read_matrix()
 	print_matrix(level_matrix)
-	--draw_mini_map(_screen,_map_window)
+	draw_mini_map(_screen,_map_window)
 	instantiate_scene()
 	draw_graphics(boxes, targets, level_matrix)
 end
@@ -98,7 +98,7 @@ local function globalTouchHandler(event)
         end
         print("--- redraw ---")
         read_matrix()
-        --draw_mini_map(_screen,_map_window)
+        draw_mini_map(_screen,_map_window)
         print_matrix(level_matrix)
         print(check_victory())
         if (check_victory() == true) then

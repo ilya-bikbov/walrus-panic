@@ -10,7 +10,7 @@ local _block_color = {
 						r = 0,
 						g = 0,
 						b = 0,
-						a = 0.3,
+						a = 1,
 					 }
 local set_block_color = {
   							["0"] = function (x) _block_color.r=0 	_block_color.g=255 	_block_color.b=0 end,
@@ -32,6 +32,8 @@ function draw_mini_map(_screen, _map_window)
 	_map_rect  = nil
 	_map_rect = display.newRect( _map_window.x, _map_window.y, _map_window.w,  _map_window.h) --:setFillColor(unpack(_map_window.color_background))
 	_map_rect:setFillColor(unpack(_map_window.color_background))
+	_map_rect.stroke = {0, 0, 0, 1}
+	_map_rect.strokeWidth = 2
 	_map_rect.anchorX = 0
 	_map_rect.anchorY = 0
 
@@ -45,7 +47,7 @@ function draw_mini_map(_screen, _map_window)
 
 	--  Вычисление размера квадрата
 	--1. Считаем максимальную сторону квадрата = int(sqrt(высота_прямоугольника*ширина_прямоугольника/количество_квадратов)) = 219 
-	local box_side_max = math.floor(math.sqrt(map_size_h  *map_size_w / block_count))
+	local box_side_max = math.floor(math.sqrt(map_size_h * map_size_w / block_count))
 	--2. Берём ширину и высоту, делим нацело на все числа от 1 до количества квадратов. Из полученного списка удаляем все числа, 
 	--   большие максимальной стороны квадрата, удаляем дубликаты и сортируем по убыванию.
 	local nums = {}
@@ -64,7 +66,8 @@ function draw_mini_map(_screen, _map_window)
 	--print( table.concat( nums, ", " ) )  --> 5, 4, 3, 2, 1
 	--3. Для полученных размеров считаем количество квадратов, умещающихся в прямоугольник = int(высота_прямоугольника/размер_квадрата)*int(ширина_прямоугольника/размер_квадрата).
 	--   Как только получаем число большее необходимого количества квадратов - останавливаемся.
-	local res = 30  --math.floor( math.floor(map_size_h/nums[1])*math.floor(map_size_w/nums[1]) )
+	--local res = 8  --math.floor( math.floor(map_size_h/nums[1])*math.floor(map_size_w/nums[1]) )
+	local res = map_size_h/20
 	-- !!! ДВИГАТЬ RES РУКАМИ В ЗАВИСИМОСТИ ОТ КОЛИЧЕСТВА БЛОКОВ
 
 	--for i, size in ipairs(nums) do
@@ -75,13 +78,13 @@ function draw_mini_map(_screen, _map_window)
 	--end
 	--print( "res: ", res )
 
-	local tmp_x = _map_window.x
-	local tmp_y = _map_window.y
+	local tmp_x = _map_rect.x
+	local tmp_y = _map_rect.y
 	for m, name in ipairs(level_matrix) do
  		for n, name2 in ipairs(name) do
  			local block_rect = display.newRect(block_rect_group, tmp_x, tmp_y, res, res)
 			block_rect.stroke = {0, 0, 0, 1}
-			block_rect.strokeWidth = 1.5
+			block_rect.strokeWidth = 0
 			block_rect.anchorX = 0
 			block_rect.anchorY = 0
 
@@ -104,15 +107,19 @@ function draw_mini_map(_screen, _map_window)
 			tmp_x = tmp_x + res
  		end
  		tmp_y = tmp_y + res
- 		tmp_x = _map_window.x
+ 		tmp_x = _map_rect.x
 	end
 
 	block_rect_group.x = _screen.x_center
 	block_rect_group.x = block_rect_group.x - (block_rect_group.contentWidth/2)
 
-	block_rect_group.y = _map_rect.contentHeight/2
+	block_rect_group.y = block_rect_group.y + ((_map_rect.contentHeight - block_rect_group.contentHeight) / 2)
 
-	block_rect_group.y = block_rect_group.y - (block_rect_group.contentHeight/1.5) 
+	--block_rect_group.y = _map_rect.y --+ ((_map_rect.contentHeight - block_rect_group.contentHeight) / 2)
+	--print(_map_rect.y  )
+	--block_rect_group.y = _map_rect.contentHeight/2
+
+	--block_rect_group.y = block_rect_group.y + (block_rect_group.contentHeight)
 end
 
 
